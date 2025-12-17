@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Адмін-панель - Notes App{% endblock %}
+
+{% block content %}
+<div class="admin-panel">
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h1>⚙️ Адміністраторська панель</h1>
+        <p style="color: var(--text-secondary); font-size: 1.1rem; margin-top: 1rem;">Повний контроль над системою 👑</p>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-value">{{ total_users }}</div>
+            <div class="stat-label">Користувачів</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">📝</div>
+            <div class="stat-value">{{ total_notes }}</div>
+            <div class="stat-label">Нотаток</div>
+        </div>
+    </div>
+    
+    <div class="admin-section">
+        <h2>👥 Користувачі</h2>
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Ім'я користувача</th>
+                        <th>Email</th>
+                        <th>Роль</th>
+                        <th>Дата реєстрації</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            {% if user.is_admin() %}
+                            <span class="badge badge-admin">ADMIN</span>
+                            {% else %}
+                            <span class="badge badge-user">USER</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.created_at.strftime('%d.%m.%Y') if user.created_at else 'Невідомо' }}</td>
+                        <td>
+                            {% if user.id != current_user.id %}
+                            <form method="POST" action="{{ url_for('web.admin_delete_user', user_id=user.id) }}" style="display: inline;" onsubmit="return confirm('Ви впевнені, що хочете видалити користувача {{ user.username }}?');">
+                                <button type="submit" class="btn btn-small btn-danger">🗑️ Видалити</button>
+                            </form>
+                            {% else %}
+                            <span class="text-muted">Ви</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="admin-section">
+        <h2>📝 Всі нотатки</h2>
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Заголовок</th>
+                        <th>Автор</th>
+                        <th>Дата створення</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for note in notes %}
+                    <tr>
+                        <td>{{ note.id }}</td>
+                        <td>{{ note.title }}</td>
+                        <td>{{ note.author.username }}</td>
+                        <td>{{ note.created_at.strftime('%d.%m.%Y %H:%M') if note.created_at else 'Невідомо' }}</td>
+                        <td>
+                            <a href="{{ url_for('web.edit_note', note_id=note.id) }}" class="btn btn-small btn-primary">✏️</a>
+                            <form method="POST" action="{{ url_for('web.delete_note', note_id=note.id) }}" style="display: inline;" onsubmit="return confirm('Видалити нотатку?');">
+                                <button type="submit" class="btn btn-small btn-danger">🗑️</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

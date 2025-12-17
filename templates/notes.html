@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Мої нотатки - Notes App{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>📚 {% if current_user.is_admin() %}Всі нотатки{% else %}Мої нотатки{% endif %}</h1>
+        <p style="color: var(--text-secondary); margin-top: 0.5rem;">
+            {% if current_user.is_admin() %}
+            Ви бачите всі нотатки системи 👑
+            {% else %}
+            Ваш особистий простір для ідей ✨
+            {% endif %}
+        </p>
+    </div>
+    <a href="{{ url_for('web.create_note') }}" class="btn btn-success">➕ Створити нотатку</a>
+</div>
+
+{% if notes %}
+    <div class="notes-grid">
+        {% for note in notes %}
+        <div class="note-card">
+            <div class="note-header">
+                <h3>{{ note.title }}</h3>
+                {% if current_user.is_admin() %}
+                <span class="note-author">👤 {{ note.author.username }}</span>
+                {% endif %}
+            </div>
+            <div class="note-content">
+                {{ note.content }}
+            </div>
+            <div class="note-meta">
+                <span>🕒</span>
+                <small>
+                    {{ note.created_at.strftime('%d.%m.%Y %H:%M') if note.created_at else 'Невідомо' }}
+                </small>
+            </div>
+            <div class="note-actions">
+                <a href="{{ url_for('web.edit_note', note_id=note.id) }}" class="btn btn-small btn-primary">✏️ Редагувати</a>
+                <form method="POST" action="{{ url_for('web.delete_note', note_id=note.id) }}" style="display: inline;" onsubmit="return confirm('Ви впевнені, що хочете видалити цю нотатку?');">
+                    <button type="submit" class="btn btn-small btn-danger">🗑️ Видалити</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <div style="font-size: 5rem; margin-bottom: 1rem;">📝</div>
+        <p>Поки що немає нотаток</p>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 1rem;">Створіть свою першу нотатку прямо зараз!</p>
+        <a href="{{ url_for('web.create_note') }}" class="btn btn-primary">✨ Створити першу нотатку</a>
+    </div>
+{% endif %}
+{% endblock %}
+
