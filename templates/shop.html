@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Меню — FireSlice{% endblock %}
+
+{% block content %}
+<section class="text-center">
+  <h1 class="text-4xl font-extrabold text-orange-600 mb-10">Меню</h1>
+  <p class="text-gray-600 mb-12 max-w-2xl mx-auto">
+    Вибери свою улюблену піцу — з класики чи авторських рецептів.  
+    Усе готуємо на справжньому вогні. 🔥
+  </p>
+
+  {% for category, items in menu.items() %}
+  <div class="mb-16">
+    <h2 class="text-2xl font-bold text-gray-800 mb-8 border-b-4 border-orange-500 inline-block px-4 py-1">
+      {{ category }}
+    </h2>
+
+    <!-- Grid of pizzas -->
+    <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      {% for item in items %}
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition flex flex-col">
+        <img src="{{ item.image }}" alt="{{ item.name }}" class="h-48 w-full object-cover">
+        <div class="p-5 flex flex-col justify-between flex-grow">
+          <div>
+            <h3 class="text-xl font-semibold text-orange-600 mb-1">{{ item.name }}</h3>
+            <p class="text-gray-600 text-sm mb-3 h-12 overflow-hidden">{{ item.ingredients }}</p>
+            <p class="text-lg font-bold text-gray-800 mb-4">{{ item.price }} грн</p>
+          </div>
+
+          <form action="{{ url_for('add_to_cart') }}" method="post">
+            <input type="hidden" name="item_name" value="{{ item.name }}">
+            <input type="hidden" name="item_price" value="{{ item.price }}">
+            <input type="hidden" name="item_image" value="{{ item.image }}">
+            <button type="submit"
+              class="w-full bg-orange-500 text-white font-semibold py-2 rounded-lg hover:bg-orange-600 transition">
+              Додати в кошик
+            </button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+</section>
+{% endblock %}
+
